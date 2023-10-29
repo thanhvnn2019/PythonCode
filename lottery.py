@@ -15,9 +15,9 @@ draw = []
 
 if not last_draw:
     for _ in range(6):
-        num = random.randint(1, 55)
+        num = random.randint(1, 45)
         while num in draw:
-            num = random.randint(1, 55)
+            num = random.randint(1, 45)
         draw.append(num)
     draw.sort()
     with open(file_path, 'w') as file:
