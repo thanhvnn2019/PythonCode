@@ -1,7 +1,22 @@
 import numpy as np
-from pandas.core.common import random_state
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+
+
+def get_accuracy(model, X_test, y_test, set_of_numbers):
+    predicted_numbers = model.predict(X_test)
+    score = model.score(X_test, y_test)
+
+    # Filter the elements in the array that are in the list of numbers
+    result = np.in1d(predicted_numbers, set_of_numbers)
+
+    print(f"Model accuracy: {score}")
+
+    if np.all(result):  # If all element of set_of_numbers in predicted_numbers
+        return np.array(set_of_numbers)
+    else:
+        return None
+
 
 dataset = [
     [14, 22, 32, 37, 43, 48, 42],
@@ -26,37 +41,27 @@ dataset = [
     # Add more data...
     # [11, 14, 25, 44, 46, 47, 10],
 ]
-
 flattened_dataset = np.array(dataset).flatten()
-
 reshaped_dataset = flattened_dataset.reshape(-1, 1)
 
-X_train, X_test, y_train, y_test = train_test_split(reshaped_dataset, reshaped_dataset, test_size=0.2, random_state=None)
+X_train, X_test, y_train, y_test = train_test_split(reshaped_dataset, reshaped_dataset, test_size=0.2,
+                                                    random_state=None)
 
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-# Given list
 set_of_numbers = np.array([11, 14, 25, 44, 46, 47, 10])
 
-score = model.score(X_test, y_test)
-print(f"Model accuracy: {score}")
-
-predicted_numbers = model.predict(X_test)
-
+# Get the accuracy of the model and filter the numbers if necessary
+filtered_numbers = get_accuracy(model, X_test, y_test, set_of_numbers)
 while True:
-    # Use a list comprehension to filter the elements in the array that are in the list of numbers
-    result = np.in1d(predicted_numbers, set_of_numbers)
 
-    # Print the elements that are in the array
-    if all(result):
-        print(random_state)
-        print(result)
+    if filtered_numbers is not None:
+        print(f"Filtered numbers: {filtered_numbers}")
         break
     else:
         # Re-run the program
         import sys
         sys.stdout.flush()
-        model.fit(X_train, y_train)
+        X_train, X_test, y_train, y_test = train_test_split(reshaped_dataset, reshaped_dataset, test_size=0.2, random_state=None)
         predicted_numbers = model.predict(X_test)
-        print(predicted_numbers)
