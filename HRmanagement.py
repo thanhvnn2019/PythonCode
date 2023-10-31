@@ -1,80 +1,69 @@
 import tkinter as tk
 from tkinter import messagebox
 
-# Global variable to store all employees
-employees = []
+def create_main_window():
+    window = tk.Tk()
+    window.title("HR Management System")
+    window.geometry("350x300")
 
+
+# Labels and entries
+    name_label = tk.Label(window, text="Name:")
+    name_label.grid(row=0, column=0)
+    name_entry = tk.Entry(window)
+    name_entry.grid(row=0, column=1)
+
+    email_label = tk.Label(window, text="Email:")
+    email_label.grid(row=1, column=0)
+    email_entry = tk.Entry(window)
+    email_entry.grid(row=1, column=1)
+
+    phone_label = tk.Label(window, text="Phone:")
+    phone_label.grid(row=2, column=0)
+    phone_entry = tk.Entry(window)
+    phone_entry.grid(row=2, column=1)
+
+    register_date_label = tk.Label(window, text="Register Date:")
+    register_date_label.grid(row=3, column=0)
+    register_date_entry = tk.Entry(window)
+    register_date_entry.grid(row=3, column=1)
+
+    user_status_label = tk.Label(window, text="User Status:")
+    user_status_label.grid(row=4, column=0)
+    user_status_entry = tk.Entry(window)
+    user_status_entry.grid(row=4, column=1)
+
+    role_label = tk.Label(window, text="Role:")
+    role_label.grid(row=5, column=0)
+    role_entry = tk.Entry(window)
+    role_entry.grid(row=5, column=1)
+
+    role_label = tk.Label(window, text="Role:")
+
+    return window
 
 def add_employee():
-    name = entry_name.get()
-    age = entry_age.get()
-    gender = entry_gender.get()
-    department = entry_department.get()
-    role = entry_role.get()
-    salary = entry_salary.get()
+    name = name_entry.get()
+    email = email_entry.get()
+    phone = phone_entry.get()
+    register_date = register_date_entry.get()
+    user_status = user_status_entry.get()
+    role = role_entry.get()
 
-    if not name or not age or not gender or not department or not role or not salary:
-        messagebox.showerror("Error", "Please fill all the fields.")
-        return
+    employees.append([name, email, phone, register_date, user_status, role])
 
-    employees.append({
-        "name": name,
-        "age": age,
-        "gender": gender,
-        "department": department,
-        "role": role,
-        "salary": salary
-    })
+    name_entry.delete(0, 'end')
+    email_entry.delete(0, 'end')
+    phone_entry.delete(0, 'end')
+    register_date_entry.delete(0, 'end')
+    user_status_entry.delete(0, 'end')
+    role_entry.delete(0, 'end')
 
-    # Reset the form
-    entry_name.delete(0, tk.END)
-    entry_age.delete(0, tk.END)
-    entry_gender.delete(0, tk.END)
-    entry_department.delete(0, tk.END)
-    entry_role.delete(0, tk.END)
-    entry_salary.delete(0, tk.END)
-
-    # Show success message
     messagebox.showinfo("Success", "Employee added successfully.")
 
-
-# Create the main window
-root = tk.Tk()
-root.title("HR Management System")
-
-# Create the form widgets
-label_name = tk.Label(root, text="Name:")
-label_age = tk.Label(root, text="Age:")
-label_gender = tk.Label(root, text="Gender:")
-label_department = tk.Label(root, text="Department:")
-label_role = tk.Label(root, text="Role:")
-label_salary = tk.Label(root, text="Salary:")
-
-entry_name = tk.Entry(root)
-entry_age = tk.Entry(root)
-entry_gender = tk.Entry(root)
-entry_department = tk.Entry(root)
-entry_role = tk.Entry(root)
-entry_salary = tk.Entry(root)
-
-button_add = tk.Button(root, text="Add Employee", command=add_employee)
-
-# Place the form widgets on the grid
-label_name.grid(row=0, column=0)
-label_age.grid(row=1, column=0)
-label_gender.grid(row=2, column=0)
-label_department.grid(row=3, column=0)
-label_role.grid(row=4, column=0)
-label_salary.grid(row=5, column=0)
-
-entry_name.grid(row=0, column=1)
-entry_age.grid(row=1, column=1)
-entry_gender.grid(row=2, column=1)
-entry_department.grid(row=3, column=1)
-entry_role.grid(row=4, column=1)
-entry_salary.grid(row=5, column=1)
-
-button_add.grid(row=6, column=1)
-
-# Start the main event loop
-root.mainloop()
+    def export_data():
+    with open("employee_data.txt", "w") as file:
+        for employee in employees:
+            file.write("\n".join(employee))
+            file.write("\n")
+    messagebox.showinfo("Success", "Employee data exported successfully.")
