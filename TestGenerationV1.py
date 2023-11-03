@@ -1,67 +1,61 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
+import pandas as pd
+from keras.models import Sequential
+from keras.layers import Dense
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_squared_error
 
+# Load the dataset
+with open('D:\previous_results.txt', 'r') as file:
+    data = pd.read_csv(file, delimiter=' ', header=0)
 
-def get_accuracy(model, X_test, y_test, set_of_numbers):
-    predicted_numbers = model.predict(X_test)
-    score = model.score(X_test, y_test)
+# Rename the columns
+data.columns = ['Number', 'Number1', 'Number2', 'Number3', 'Number4', 'Number5', 'Number6']
 
-    # Filter the elements in the array that are in the list of numbers
-    result = np.in1d(predicted_numbers, set_of_numbers)
+# Define the feature set (X) and the target variable (y)
+X = data[['Number1', 'Number2']]
+y = data['Number']
 
-    print(f"Model accuracy: {score}")
+# Scale the data
+scaler = MinMaxScaler()
+X = scaler.fit_transform(X)
+y = scaler.fit_transform(y.values.reshape(-1, 1))
 
-    if np.all(result):  # If all element of set_of_numbers in predicted_numbers
-        return np.array(set_of_numbers)
-    else:
-        return None
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Define the model
+model = Sequential()
+model.add(Dense(32, input_dim=2, activation='relu'))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(1, activation='linear'))
 
-dataset = [
-    [14, 22, 32, 37, 43, 48, 42],
-    [12, 20, 26, 33, 40, 44, 24],
-    [11, 16, 24, 34, 47, 52, 15],
-    [1, 23, 29, 37, 51, 55, 54],
-    [13, 22, 33, 41, 46, 47, 9],
-    [8, 23, 30, 34, 38, 47, 10],
-    [5, 8, 9, 20, 36, 50, 35],
-    [6, 23, 26, 37, 44, 46, 33],
-    [4, 13, 36, 40, 43, 52, 34],
-    [14, 22, 32, 37, 43, 48, 42],
-    [12, 20, 26, 33, 40, 44, 24],
-    [11, 16, 24, 34, 47, 52, 15],
-    [1, 23, 29, 37, 51, 55, 54],
-    [13, 22, 33, 41, 46, 47, 9],
-    [8, 23, 30, 34, 38, 47, 10],
-    [5, 8, 9, 20, 36, 50, 35],
-    [6, 23, 26, 37, 44, 46, 33],
-    [4, 13, 36, 40, 43, 52, 34],
-    [1, 21, 33, 46, 47, 53, 9],
-    # Add more data...
-    # [11, 14, 25, 44, 46, 47, 10],
-]
-flattened_dataset = np.array(dataset).flatten()
-reshaped_dataset = flattened_dataset.reshape(-1, 1)
+# Compile the model
+model.compile(loss='mean_squared_error', optimizer='adam')
 
-X_train, X_test, y_train, y_test = train_test_split(reshaped_dataset, reshaped_dataset, test_size=0.2,
-                                                    random_state=None)
+# Train the model
+model.fit(X_train, y_train, epochs=100, batch_size=1, verbose=0)
 
-model = LinearRegression()
-model.fit(X_train, y_train)
+# Make predictions using the testing data
+predictions = model.predict(X_test)
 
-set_of_numbers = np.array([11, 14, 25, 44, 46, 47, 10])
+# Calculate the mean squared error of the predictions
+mse = mean_squared_error(y_test, predictions)
+print('Mean Squared Error:', mse)
 
-# Get the accuracy of the model and filter the numbers if necessary
-filtered_numbers = get_accuracy(model, X_test, y_test, set_of_numbers)
-while True:
+# Predict the next 6-number lottery result for each of the 10 possible digits
+predictions = []
+for i in range(10):
+    for j in range(10):
+        predictions.append(model.predict([[i, j]]))
 
-    if filtered_numbers is not None:
-        print(f"Filtered numbers: {filtered_numbers}")
-        break
-    else:
-        # Re-run the program
-        import sys
-        sys.stdout.flush()
-        X_train, X_test, y_train, y_test = train_test_split(reshaped_dataset, reshaped_dataset, test_size=0.2, random_state=None)
-        predicted_numbers = model.predict(X_test)
+# Find the most likely digit combinations
+top_predictions = sorted(predictions, key=lambda x: x[0])[-6:]
+
+# Combine the most likely digit combinations into a 6-number lottery result
+next_result = ''
+for prediction in top_predictions:
+    next_result += str(int(prediction[0]))
+
+print('Next 6-Number Lottery Result:', next_result)
